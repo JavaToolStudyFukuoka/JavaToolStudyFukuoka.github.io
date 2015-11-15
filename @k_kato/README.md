@@ -5,7 +5,7 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.jlinqer/jlinqer/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.jlinqer/jlinqer)
 [![License: MIT](http://img.shields.io/badge/license-MIT-orange.svg)](LICENSE)
 
-最近 GitHub でよく見かける ↑ のバッチの意味は何でしょうか？
+GitHub で見かける ↑ のバッチの意味は何でしょうか？
 
 Java OSS のビルド・テスト・デプロイ・ライブラリ依存関係を自動コード化する仕組みと，
 GitHub 連携による継続的自動ビルドを簡単に構築する方法についてお話しします。

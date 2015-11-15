@@ -155,14 +155,16 @@
 
         <section data-markdown>
             <script type="text/template">
-                ## Maven Central 公開手順
+                ## [初めての Maven Central 公開](http://tagomoris.hatenablog.com/entry/20141028/1414485679)
 
                 1. package 名前空間を決める (com.github.xyzzy)
                 1. GitHub アカウント取得 (xyzzy)
+                1. Sonatype OSSRH アカウント作成
+                1. OSSRH JIRA > Create Issue
                 1. GPG 鍵作成 (Send public key to Keyserver)
-                1. pom.xml ビルド，署名
-                1. 
-
+                1. ~/.m2/settings.xml (OSSRH，GPG 追加) 
+                1. [pom.xml ビルド，Javadoc，テスト，署名](https://github.com/k--kato/jLinqer/blob/master/pom.xml)
+                1. デプロイ mvn clean deploy -D performRelease=true
             </script>
         </section>
 
@@ -173,7 +175,6 @@
                     <img src="./img/circleci.svg" style="height: 40px;"/>
                 </a>
 
-                - 正常ビルド
                 - Pull Request トリガーで自動ビルド
             </script>
         </section>

@@ -11,4 +11,4 @@ Java OSS のビルド・テスト・デプロイ・ライブラリ依存関係�
 GitHub 連携による継続的自動ビルドを簡単に構築する方法についてお話しします。
 
 
-†スライド, GitHub x CircleCI x Maven Central, https://JavaToolStudyFukuoka.github.io/@k_kato/index.html
+†スライド, GitHub x CircleCI x Maven Central, https://JavaToolStudyFukuoka.github.io/BuildTools/@k_kato/index.html

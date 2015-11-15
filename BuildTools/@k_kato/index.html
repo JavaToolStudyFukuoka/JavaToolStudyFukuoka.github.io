@@ -159,15 +159,25 @@
 
                 1. Java package 名前空間を決める (com.github.xyzzy)
                 1. GitHub [アカウント取得](https://github.com/join) (xyzzy)
-                1. OSSRH (OSS Repository Hosting) [アカウント作成](https://issues.sonatype.org/secure/Signup!default.jspa)
-                1. OSSRH JIRA で [Create Issue](https://issues.sonatype.org/secure/CreateIssue.jspa?issuetype=21&pid=10134) [(起票例)](https://issues.sonatype.org/browse/OSSRH-16339)
+                1. OSSRH (OSS Repository Hosting) [JIRAアカウント作成](https://issues.sonatype.org/secure/Signup!default.jspa)
+                1. OSSRH JIRA でチケットを作成 [Create Issue](https://issues.sonatype.org/secure/CreateIssue.jspa?issuetype=21&pid=10134) [(起票例)](https://issues.sonatype.org/browse/OSSRH-16339)
                 1. [GPG](https://gpgtools.org/) 署名の鍵作成。Send public key to Keyserver する
-                1. ~/.m2/settings.xml に OSSRH，GPG 情報を追加 ([記入例](http://tagomoris.hatenablog.com/entry/20141028/1414485679))
+                1. ~/.m2/settings.xml に OSSRH，GPG 情報を追加 ([コード例](http://tagomoris.hatenablog.com/entry/20141028/1414485679))
                 1. pom.xml にビルド，Javadoc，テスト，GPG，OSSRH 情報を追加 ([コード例](https://github.com/k--kato/jLinqer/blob/master/pom.xml))
-                1. デプロイ mvn clean deploy -D performRelease=true
-                1. デプロイ成功を [oss.sonatype.org com.github](https://oss.sonatype.org/content/groups/public/com/github/) で確認
-                1. JIRA で正常ビルドを報告 ([報告例](https://issues.sonatype.org/browse/OSSRH-16339?focusedCommentId=321040&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-321040))
-                
+                1. デプロイ mvn clean deploy -DperformRelease=true
+                1. デプロイ結果を確認 [oss.sonatype.org com.github](https://oss.sonatype.org/content/groups/public/com/github/)
+                1. JIRA でデプロイ成功を報告 ([報告例](https://issues.sonatype.org/browse/OSSRH-16339?focusedCommentId=321040&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-321040))
+            </script>
+        </section>
+
+        <section data-markdown>
+            <script type="text/template">
+                ## もしも CircleCI がなかったら
+
+                - 最新のソースコードを Pull したらビルドが通らない
+                - 自分のローカル環境では動作していたのに，というコミット漏れに気づかない
+                - コミット直前に修正したコードでバグを仕込む
+                - リリース日にビルドスクリプトが壊れていたことが判明
             </script>
         </section>
 
@@ -178,13 +188,18 @@
                     <img src="./img/circleci.svg" style="height: 40px;"/>
                 </a>
                 
-                - GitHub Pull Request トリガーで自動ビルド
+                - Pull Request トリガーで自動ビルド
                 - Maven ビルド対応
                 - Java 8 対応
-                - 1コンテナ無料 (無料枠で private リポジトリも OK)
+                - 1コンテナ無料
             </script>
         </section>
 
+        <section data-markdown>
+            <script type="text/template">
+            
+            </script>
+        </section>
 
     </div>
 

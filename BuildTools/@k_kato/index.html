@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
 
-    <title>GitHub x CircleCI x Maven Central</title>
+    <title>GitHub x Maven Central x Coveralls x CircleCI</title>
 
     <meta name="description" content="GitHub x CircleCI x Maven Central">
     <meta name="author" content="k_kato">
@@ -44,12 +44,13 @@
 
         <section data-markdown>
             <script type="text/template">
-                ## GitHub
+                ### GitHub
                 x
-                ## CircleCI
+                ### Maven Central
                 x
-                ## Maven Central
-                in
+                ### Coveralls
+                x
+                ### CircleCI
                 #### Java Tool Study Fukuoka
                 ###### November 20 2015 / @k_kato
             </script>
@@ -76,6 +77,8 @@
 
         <section data-markdown>
             <script type="text/template">
+                # GitHub
+                
                 <img src="./img/maven_central.svg" style="height: 100px;"/>
                 <img src="./img/coveralls.svg" style="height: 100px;"/>
                 <img src="./img/circleci.svg" style="height: 100px;"/>
@@ -91,6 +94,12 @@
                     <img src="./img/coveralls.svg" style="height: 30px; position:absolute; top:120px; left:560px"/><!-- .element: class="fragment" data-fragment-index="1" -->
                     <img src="./img/circleci.svg" style="height: 30px; position:absolute; top:200px; left:760px"/><!-- .element: class="fragment" data-fragment-index="5" -->
                 </div>
+            </script>
+        </section>
+
+        <section data-markdown>
+            <script type="text/template">
+                <img src="./img/maven_central.svg" style="height: 140px;"/>
             </script>
         </section>
 
@@ -117,6 +126,7 @@
                 Project Object Model
 
                 pom.xml
+                <div>
                 ```xml
                 <dependency>
                     <groupId>junit</groupId>
@@ -124,12 +134,13 @@
                     <version>4.12</version>
                 </dependency>
                 ```
+                </div><!-- .element: class="fragment" data-fragment-index="1" -->    
             </script>
         </section>
 
         <section data-markdown>
             <script type="text/template">
-                # Maven Central
+                # Maven
                 <div style="position: relative">
                     <img src="./img/maven_repositories.png"/>
                     <img src="./img/maven_central.svg" style="height: 30px; position:absolute; top:320px; left:670px"/><!-- .element: class="fragment" data-fragment-index="1" -->
@@ -145,17 +156,19 @@
                 </a>
 
                 - Java ライブラリの ~~墓場~~ 総合商社
-                - Scala, Spring, Jersey, Apache Commons, etc...
-                - 登録するとライブラリを簡単に配布できる
+                 - Scala, Spring, Jersey, Apache Commons, etc...
+                - ライブラリを簡単に配布できる
                 - Javadoc とソースコードも配布できる
                 - ライブラリのバージョンを継続的に管理できる
+                
+                ※公開手続きが多く面倒！ <!-- .element: class="fragment" data-fragment-index="1" -->
 
             </script>
         </section>
 
         <section data-markdown>
             <script type="text/template">
-                ## [初めての Maven Central 公開](http://tagomoris.hatenablog.com/entry/20141028/1414485679)
+                ### 初めての Maven Central 公開 [tagomoris](http://tagomoris.hatenablog.com/entry/20141028/1414485679)
 
                 1. Java package 名前空間を決める (com.github.xyzzy)
                 1. GitHub [アカウント取得](https://github.com/join) (xyzzy)
@@ -172,12 +185,104 @@
 
         <section data-markdown>
             <script type="text/template">
-                ## もしも CircleCI がなかったら
+                <img src="./img/coveralls.svg" style="height: 140px;"/>
+            </script>
+        </section>
 
-                - 最新のソースコードを Pull したらビルドが通らない
-                - 自分のローカル環境では動作していたのに，というコミット漏れに気づかない
-                - コミット直前に修正したコードでバグを仕込む
-                - リリース日にビルドスクリプトが壊れていたことが判明
+        <section data-markdown>
+            <script type="text/template">
+                # Coveralls
+                <a href="https://coveralls.io/github/k--kato/jLinqer?branch=master" target="_blank">
+                    <img src="./img/coveralls.svg" style="height: 40px;"/>
+                </a>
+
+                - コードカバレッジを CI する Web サービス
+                - GitHub Pull Request トリガーで自動ビルド
+                - CircleCI 対応
+                - Maven ビルド対応
+                - Java 8 も JaCoCo のカバレッジレポートに対応
+                - 公開リポジトリは無料
+                
+            </script>
+        </section>
+
+        <section data-markdown>
+            <script type="text/template">
+                ## もしも Coveralls がなかったら
+
+                - コードテストされているかわからない<!-- .element: class="fragment" data-fragment-index="0" -->
+                 - ライブラリに採用しても良い品質か？<!-- .element: class="fragment" data-fragment-index="0" -->
+                - 品証チームから 87% 以上のカバレッジエビデンスを求められているが，未達でも Pull Request をマージしている<!-- .element: class="fragment" data-fragment-index="5" -->
+                
+            </script>
+        </section>
+
+        <section data-markdown>
+            <script type="text/template">
+                ### カバレッジ 100% は信用ならない？
+
+                > 100%は信用ならない。
+                > カバレッジの数字ばっかり気にして、自分が何をやっているかわかっていない人間のいる臭いがする
+                > \- Martin Fowler
+                
+                > カバレジが多くなったときに欠陥が減る結果になることを示すエビデンスはほとんどないのが実情です
+                > \- 「エビデンスに基づくエラー予測」
+                > Nachiappan Nagappan, Thomas Ball
+                 
+            </script>
+        </section>
+
+        <section data-markdown>
+            <script type="text/template">
+                ### エビデンスに基づくエラー予測 Nachiappan Nagappan, Thomas Ball
+                #### 「コードカバレジが高いと品質も高い」？<!-- .element: class="fragment" data-fragment-index="0" -->
+
+                - カバレジは実行される命令の割合だけであり，命令の間違いを含んでいるかを考慮しない<!-- .element: class="fragment" data-fragment-index="1" -->
+                - テスト実施者のデータで命令や分岐が実行されても，顧客や利用時のシナリオとデータが異なる<!-- .element: class="fragment" data-fragment-index="5" -->
+                - Windows Vista 4千万行で計測したところ，コードカバレジと品質との間には弱い正の相関があり，精度 83.3%，再現率 54.8% 低い値であった<!-- .element: class="fragment" data-fragment-index="10" -->
+                - コードカバレジだけではなく，コード変更量や複雑度と組み合わせるべき<!-- .element: class="fragment" data-fragment-index="15" -->
+
+            </script>
+        </section>
+
+        <section data-markdown>
+            <script type="text/template">
+                ## Maven x Coveralls 設定
+                ### pom.xml
+
+                ```xml
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.7.5.201505241946</version>
+                    <executions>
+                        <execution>
+                            <id>prepare-agent</id>
+                            <goals>
+                              <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.eluder.coveralls</groupId>
+                    <artifactId>coveralls-maven-plugin</artifactId>
+                    <version>4.0.0</version>
+                    <configuration>
+                        <!--<repoToken></repoToken>-->
+                        <sourceEncoding>UTF-8</sourceEncoding>
+                    </configuration>
+                </plugin>
+                ```
+                
+                ```bash
+                mvn clean test jacoco:report coveralls:report -DrepoToken=$COVERALLS_TOKEN
+                ```
+            </script>
+        </section>
+        <section data-markdown>
+            <script type="text/template">
+                <img src="./img/circleci.svg" style="height: 140px;"/>
             </script>
         </section>
 
@@ -187,20 +292,144 @@
                 <a href="https://circleci.com/gh/k--kato/jLinqer" target="_blank">
                     <img src="./img/circleci.svg" style="height: 40px;"/>
                 </a>
-                
-                - Pull Request トリガーで自動ビルド
+
+                - ビルドを CI する Web サービス
+                - GitHub Pull Request トリガーで自動ビルド
                 - Maven ビルド対応
                 - Java 8 対応
-                - 1コンテナ無料
+                - 1 コンテナ無料
+
+                「はやめのリリース，しょっちゅうリリース」  
+                \- Eric S. Raymond<!-- .element: class="fragment" data-fragment-index="1" -->
+                [「伽藍とバザール」](http://cruel.org/freeware/cathedral.html#4)<!-- .element: class="fragment" data-fragment-index="1" -->
             </script>
         </section>
 
         <section data-markdown>
             <script type="text/template">
-            
+                ## もしも CircleCI がなかったら
+
+                - 最新のソースコードを pull したらビルドが通らない<!-- .element: class="fragment" data-fragment-index="1" -->
+                - 自分の環境ではビルドが成功していたのに，全員の環境でビルドエラーが発生した<!-- .element: class="fragment" data-fragment-index="5" -->
+                - リリース日にビルドスクリプトが壊れていたことが判明<!-- .element: class="fragment" data-fragment-index="10" -->
+            </script>
+        </section>
+        
+        <section data-markdown>
+            <script type="text/template">
+                ### Maven x Coveralls x CircleCI 設定
+                ### circle.yml
+                
+                ```ruby
+                machine:
+                  timezone:
+                    Asia/Tokyo
+                  java:
+                    version: oraclejdk8
+                dependencies:
+                  pre:
+                    - mvn dependency:resolve
+                test:
+                  override:
+                    - mvn integration-test
+                  post:
+                    - mvn clean test jacoco:report coveralls:report -DrepoToken=$COVERALLS_TOKEN
+                    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
+                    - find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+                ```
             </script>
         </section>
 
+        <section data-markdown>
+            <script type="text/template">
+                ## GitHub
+                ### Pull Request
+
+                    <img src="./img/circleci_push.png"/>
+                
+            </script>
+        </section>
+
+        <section data-markdown>
+            <script type="text/template">
+                ## GitHub
+                ### CircleCI ビルド失敗
+
+                <img src="./img/circleci_failed.png"/>
+
+            </script>
+        </section>
+
+        <section data-markdown>
+            <script type="text/template">
+                ## GitHub
+                ### CircleCI ビルド成功
+
+                <img src="./img/circleci_succeed.png" style="height: 480px"/>
+
+            </script>
+        </section>
+
+        <section data-markdown>
+            <script type="text/template">
+                ## GitHub バッチ設定
+                ### README.md
+
+                ```md
+                [![Circle CI](https://circleci.com/gh/k--kato/jLinqer.svg?style=shield&circle-token=5a717ccbb33b6a206644b5e630807fc9dff1597f)](https://circleci.com/gh/k--kato/jLinqer)
+                [![Coverage Status](https://coveralls.io/repos/k--kato/jLinqer/badge.svg?branch=master&service=github)](https://coveralls.io/github/k--kato/jLinqer?branch=master)
+                [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.jlinqer/jlinqer/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.jlinqer/jlinqer)
+                [![License: MIT](http://img.shields.io/badge/license-MIT-orange.svg)](LICENSE)
+                ```
+
+            </script>
+        </section>
+
+        <section data-markdown>
+            <script type="text/template">
+                ## GitHub
+                ### 名誉の証し
+
+                <img src="./img/github_budge.png"/>
+
+            </script>
+        </section>
+
+        <section data-markdown>
+            <script type="text/template">
+                ## まとめ
+
+                - Maven Central の公開手順がわかった
+                - コードカバレッジの CI が Coveralls で構築できた
+                - ビルドの CI が CircleCI で構築できた
+                - GitHub，Maven，Coveralls，CircleCI を連携できた
+
+            </script>
+        </section>
+
+        <section data-markdown>
+            <script type="text/template">
+                <img src="./img/NYAN_CAT.gif"/>
+            </script>
+        </section>
+
+        <section data-markdown>
+            <script type="text/template">
+                ## 参考文献
+
+                - [はじめてのmaven central 公開](http://tagomoris.hatenablog.com/entry/20141028/1414485679)
+                - [Mavenリポジトリ](https://kengotoda.gitbooks.io/what-is-maven/content/primer/maven-repository.html)
+                - [社内クローズドなリポジトリをGitHubに公開するのは色々つらいけど、おかげで色々解き放たれた件](http://stormcat.hatenablog.com/entry/2014/09/11/100000)
+                - [GithubのREADMEにMaven Centralのバッジつけた](http://stormcat.hatenablog.com/entry/2014/09/04/230919)
+                - [テストカバレッジ](http://bliki-ja.github.io/TestCoverage/)
+                - [Making Software――エビデンスが変えるソフトウェア開発](http://www.oreilly.co.jp/books/9784873115115/)
+                - [伽藍とバザール](http://cruel.org/freeware/cathedral.html)
+                - [coveralls-maven-plugin](https://github.com/trautonen/coveralls-maven-plugin)
+                - [maven-badges](https://github.com/jirutka/maven-badges)
+                - [Nyan Cat](http://img1.wikia.nocookie.net/__cb20150415221840/clashofclans/images/3/30/NYAN_CAT.gif)
+
+            </script>
+        </section>
     </div>
 
 </div>

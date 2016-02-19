@@ -1,6 +1,5 @@
 ## Emo Test Quotes
 
-テストにまつわるエモい名言集を紹介します。
+テストにまつわるエモい名言を集めてみました。
 
-†スライド, エモ テスト名言集, <a href="https://k--kato.github.io/javatest/index.html" target="_blank">https://k--kato.github.io/javatest/index.html</a>
-
+†スライド, エモ テスト名言集, <a href="https://JavaToolStudyFukuoka.github.io/TestTools/@k_kato/index.html" target="_blank">https://JavaToolStudyFukuoka.github.io/TestTools/@k_kato/index.html</a>

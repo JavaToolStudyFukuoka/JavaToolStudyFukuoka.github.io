@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+
+        <title>Javaのログライブラリの話初心者編</title>
+
+        <meta name="description" content="Javaのログライブラリについて、Javaツール勉強会＠福岡 2016/04用の発表資料">
+
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+        <link rel="stylesheet" href="css/reveal.css">
+        <link rel="stylesheet" href="css/theme/solarized.css" id="theme">
+
+        <!-- Code syntax highlighting -->
+        <link rel="stylesheet" href="lib/css/zenburn.css">
+
+        <!-- Printing and PDF exports -->
+        <script>
+            var link = document.createElement( 'link' );
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+            document.getElementsByTagName( 'head' )[0].appendChild( link );
+        </script>
+
+        <!--[if lt IE 9]>
+        <script src="lib/js/html5shiv.js"></script>
+        <![endif]-->
+    </head>
+
+    <body>
+
+        <div class="reveal">
+
+            <!-- Any section element inside of this container is displayed as a slide -->
+            <div class="slides">
+                <section>
+                    <h1>Javaのログ<br>
+                    ライブラリの話<br>
+                    初心者編</h1>
+                    <h3>Javaツール勉強会＠福岡 2016/04</h3>
+                    <p>
+                        <small>吉村 武志 (<a href="http://twitter.com/takesi_yosimura">@takesi_yosimura</a>)</small>
+                    </p>
+                    <aside class="notes">
+                        １／？
+                    </aside>
+                </section>
+
+                <section data-markdown id="profile">
+                    ## 自己紹介
+
+                    吉村 武志
+
+                    福岡周辺の勉強会に ちょくちょく参加して 、
+
+                    togetterまとめたりしてる人
+
+                    Javaの勉強会やってますが、 仕事はClassic ASP &amp; VB.Net
+
+                    趣味は音ゲーとかアナログゲーム（ボードゲーム・TRPG）
+                </section>
+
+                <section>
+                    <section data-markdown>
+                        # 先にお断り
+                    </section>
+                    <section data-markdown>
+                        ### まともに使ってない人の発表です。
+                        # ツッコミ求む！
+                    </section>
+                </section>
+
+                <section>
+                    <section data-markdown>
+                        ## で、ログの中身の前に
+                    </section>
+                    <section data-markdown>
+                        ## なぜログを使うんだっけ？
+                    </section>
+                    <section>
+                        <h2>障害解析 ？</h2>
+
+                        <img width="1060" height="282" data-src="./img/zundoko.png" alt="ズンドコキヨシ">
+                        <p>あるかも・・・</p>
+                    </section>
+                    <section>
+                        <h2>監査対応 ？</h2>
+
+                        <img width="806" height="148" data-src="./img/kansa.png" alt="個人情報漏洩ログ？">
+                        <p>あるかも・・・</p>
+                    </section>
+                    <section>
+                        <h2>当たり前の事ですが</h2>
+                        <p>ログは起きた事の記録なので、<br>後から追跡する用途のためのもの</p>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h3>ログ ＝ システムで起きた事の記録</h3>
+                        <p class="fragment">これを踏まえて・・・</p>
+                    </section>
+                    <section>
+                        <h3>ログには何が欲しいか？</h3>
+                        <p class="fragment" style="text-align: left">日時</p>
+                        <p class="fragment" style="text-align: left">発生箇所(ファイル・行・クラス・メソッドなど)</p>
+                        <p class="fragment" style="text-align: left">出力抑制機能（本番でデバッグログ出さないなど）</p>
+                        <p class="fragment" style="text-align: left">・・・・・・</p>
+                        <h3 class="fragment">ログのライブラリがこれらに対応する</h3>
+                    </section>
+                </section>
+
+                <section>
+                    では実際にJavaのログライブラリを見て行く事にします
+                </section>
+
+                <section>
+                    <h2>Javaのログライブラリ</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>名称</th>
+                                <th>登場時期</th>
+                                <th>備考</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>log4j</td>
+                                <td>1999年</td>
+                                <td>2015年にEOL</td>
+                            </tr>
+                            <tr>
+                                <td>java.util.logging</td>
+                                <td>2002年(java1.4)</td>
+                                <td>残念なJava標準</td>
+                            </tr>
+                            <tr>
+                                <td>Apache Commons Logging</td>
+                                <td>2002年</td>
+                                <td>ログファサードライブラリ</td>
+                            </tr>
+                            <tr>
+                                <td>SLF4J / LOGBack</td>
+                                <td>2006年</td>
+                                <td>今のデファクト？</td>
+                            </tr>
+                            <tr>
+                                <td>Log4j2</td>
+                                <td>2014年</td>
+                                <td>１系と互換性の無いLog4j</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Log4J</h2>
+<pre><code class="java" data-trim>
+private final Logger logger = Logger.getLogger(getClass());
+
+public void log4jTest() {
+    this.logger.info("情報ログテキストを出力");
+}
+</code></pre>
+                        <p style="text-align: left">当時のデファクトスタンダード</p>
+                        <p style="text-align: left">ロガーで出力先(アペンダ)制御</p>
+                        <p style="text-align: left">アペンダで多様な出力先を実現（ファイル以外も可）</p>
+                        <p style="text-align: left">ログレベルで出力抑制制御</p>
+                        <p style="text-align: left">ロガーの階層化</p>
+                    </section>
+                    <section>
+                        <h2>Log4J</h2>
+                        <p>
+                            この後のログライブラリもだいたいLog4J互換らしいので、
+                            Log4Jについてもうちょい詳しく見ていきます。
+                        </p>
+                    </section>
+                    <section>
+                        <h2>Log4Jのロガー</h2>
+<pre><code class="java" data-trim>
+private final Logger logger = Logger.getLogger(getClass());
+</code></pre>
+                        <p>
+                            だいたい上の例のように、Logger.getLogger(String name)の
+                            引数にクラス名を渡して取得します。
+                        </p>
+                        <p>
+                            このloggerに生えたメソッドを使ってログを出力します。
+                        </p>
+                    </section>
+                    <section>
+                        <h2>Log4Jのロガーのメソッドと<br />ログレベル</h2>
+<pre><code class="java" data-trim>
+public void log4jTest() {
+    this.logger.fatal("致命的エラー");
+    this.logger.error("エラー");
+    this.logger.warn("警告");
+    this.logger.info("情報");
+    this.logger.debug("デバッグ");
+    this.logger.trace("トレース");
+}
+</code></pre>
+                        <p>
+                            上記の６つはいずれもログ出力用メソッドです。<br />
+                            上の方から順に出力優先度が高いです。
+                        </p>
+                    </section>
+                    <section>
+                        <h2>余談ですが...</h2>
+<pre><code class="java" data-trim>
+public void log4jTest() {
+    for(int i=0; i < 10000; i++) {
+        if (this.logger.isDebugEnabled()) {
+            this.logger.debug("デバッグ：" + i);
+        }
+    }
+}
+</code></pre>
+                        <p>
+                            Log4J登場当時は可変長引数が無かったので、<br />
+                            文字列結合コスト削減でこんなメソッドも使いました。
+                        </p>
+                    </section>
+                    <section>
+                        <h2>Log4Jの設定(properties版)</h2>
+<pre><code class="properties" data-trim>
+### ログメッセージを標準出力に出力するアペンダ「stdout」 ###
+log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+log4j.appender.stdout.Target=System.out
+log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+log4j.appender.stdout.layout.ConversionPattern=%d %5p %c{1} - %m%n
+
+### ログメッセージを test.log に出力するアペンダ「logfile」 ###
+log4j.appender.logfile=org.apache.log4j.RollingFileAppender
+log4j.appender.logfile.File=test.log
+log4j.appender.logfile.Append=true
+log4j.appender.logfile.MaxFileSize=1MB
+log4j.appender.logfile.MaxBackupIndex=3
+log4j.appender.logfile.layout=org.apache.log4j.PatternLayout
+log4j.appender.logfile.layout.ConversionPattern=%d %5p %c{1} - %m%n
+
+### 名前が「logtest.***」であるロガーからのアペンダは「stdout」と「logfile」 ###
+log4j.logger.logtest=info, stdout, logfile
+</code></pre>
+                        <p>
+                            上の例のように「アペンダ」を定義し「ロガー」に設定。<br>
+                            上の例はlog4j.propertiesですが、XML形式でも書けます。
+                        </p>
+                    </section>
+                    <section>
+                        <h2>Log4Jのその他</h2>
+                        <p style="text-align: left">アペンダを変えればいろいろ出力可</p>
+                        <p style="text-align: left">出力書式も好きに書ける</p>
+                        <p style="text-align: left">スレッド情報なども書式指定だけ</p>
+                        <p style="text-align: left">スタック形式のNDC、Map形式のMDCというものがあり、文脈情報を出力可</p>
+                        <p style="text-align: left">log4j1.3系は行方不明</p>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>java.util.logging</h2>
+<pre><code class="java" data-trim>
+private final Logger logger = Logger.getLogger(getClass().getName());
+
+public void loggingTest() {
+    this.logger.info("情報ログテキストを出力");
+}
+</code></pre>
+                        <p style="text-align: left">Java1.4から導入された標準API</p>
+                        <p style="text-align: left">ぱっと見Log4Jと似てる</p>
+                    </section>
+                    <section>
+                        <h2>java.util.logging</h2>
+<pre><code class="java" data-trim>
+public void loggingTest() {
+    this.logger.severe("重大");
+    this.logger.warning("警告");
+    this.logger.info("情報");
+    this.logger.config("設定？");
+    this.logger.fine("デバッグ？");
+    this.logger.finer("デバッグ？");
+    this.logger.finest("デバッグ？");
+}
+</code></pre>
+                        <p style="text-align: left">ログレベルが謎</p>
+                        <p style="text-align: left">標準書式が使いにくい</p>
+                        <p style="text-align: left">Java1.3以前で使えない</p>
+                        <p style="text-align: left">これは・・・流行らない</p>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Apache Commons Logging</h2>
+<pre><code class="java" data-trim>
+private final Log logger = LogFactory.getLog(getClass());
+
+public void loggingTest() {
+    this.logger.info("情報ログテキストを出力");
+}
+</code></pre>
+                        <p style="text-align: left">ログ実装に依存しないログファサードライブラリ</p>
+                        <p style="text-align: left">やっぱりLog4Jと似てる</p>
+                    </section>
+                    <section>
+                        <h2>Apache Commons Logging</h2>
+<pre><code class="java" data-trim>
+public void loggingTest() {
+    this.logger.fatal("致命的エラー");
+    this.logger.error("エラー");
+    this.logger.warn("警告");
+    this.logger.info("情報");
+    this.logger.debug("デバッグ");
+    this.logger.trace("トレース");
+}
+</code></pre>
+                        <p style="text-align: left">あちこちで使われてるらしい</p>
+                        <p style="text-align: left">ログレベルはlog4Jといっしょ</p>
+                        <p style="text-align: left">動的に探索して、commons-loggingの設定があれば使う</p>
+                        <p style="text-align: left">無ければlog4Jやjava.util.loggingを使う</p>
+                        <p style="text-align: left">どれも無ければSimpleLog</p>
+                    </section>
+                    <section>
+                        <h2>Apache Commons Logging</h2>
+                        <h3>動的探索が罠</h3>
+                        <p>
+                            クラスローダ使って探そうとするので、EE環境等でまともに動かないらしい<br>
+                            動的探索するという構想に無理があったとのこと。
+                        </p>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>SLF4J / LOGBack</h2>
+<pre><code class="java" data-trim>
+private final Logger logger = LoggerFactory.getLogger(getClass());
+
+public void logbackTest() {
+    this.logger.info("情報ログ{}を出力", "てきすと");
+}
+</code></pre>
+                        <p style="text-align: left">SLF4Jがログファサードライブラリ</p>
+                        <p style="text-align: left">LOGBackがログ実装</p>
+                        <p style="text-align: left">やっぱりLog4Jと似てる</p>
+                        <p style="text-align: left">プレースホルダーが使えてる嬉しい</p>
+                        <p style="text-align: left">Log4jを作った人がLog4jに愛想を尽かして作ったとか…</p>
+                    </section>
+                    <section>
+                        <h2>SLF4J</h2>
+<pre><code class="java" data-trim>
+public void logbackTest() {
+    this.logger.error("エラー");
+    this.logger.warn("警告");
+    this.logger.info("情報");
+    this.logger.debug("デバッグ");
+    this.logger.trace("トレース");
+}
+</code></pre>
+                        <p style="text-align: left">SLF4Jのログレベルはfatalがない</p>
+                        <p style="text-align: left">SLF4Jはクラス実体の差し替えとやらで実装との紐付けを実現しているらしい</p>
+                        <p style="text-align: left">使うときは正しくjarファイルの配置が必須。<br />マニュアルを見よう。</p>
+                    </section>
+                    <section>
+                        <h2>LOGBack</h2>
+<pre><code class="xml" data-trim>
+<configuration>
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} %-5level %logger{10} %msg%n</pattern>
+    </encoder>
+  </appender>
+  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <file>logback.log</file>
+    <encoder>
+      <pattern>%date %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
+    </encoder>
+  </appender>
+  <logger name="logbacktest" level="TRACE">
+    <appender-ref ref="FILE" />
+  </logger>
+  <root level="INFO">
+    <appender-ref ref="STDOUT" />
+  </root>
+</configuration>
+</code></pre>
+                        <p style="text-align: left">LOGBackは単独では使えず、SLF4J経由で呼び出す</p>
+                        <p style="text-align: left">XMLまたはgroobyで設定を書く</p>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Log4j2</h2>
+<pre><code class="java" data-trim>
+private final Logger logger = LoggerManager.getLogger(getClass());
+
+public void log4j2Test() {
+    this.logger.info("情報ログ{}を出力", "てきすと");
+}
+</code></pre>
+                        <p style="text-align: left">Log4jの1系と互換性の無いLog4j</p>
+                        <p style="text-align: left">いろいろ間に合いませんでしたorz</p>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>まとめ</h2>
+                        <p>だいたい宮川さんの資料の焼き直しでした！<br>
+                        <a href="http://www.slideshare.net/miyakawataku/concepts-and-tools-of-logging-in-java" target="_blank">http://www.slideshare.net/miyakawataku/concepts-and-tools-of-logging-in-java</a></p>
+                        <p>こだわりが無ければ、SLF4J / LOGBackを使っていれば良さそう</p>
+                    </section>
+                </section>
+
+
+                <section style="text-align: left;">
+                    <h1>おわり</h1>
+                    <p>
+                        事情がいろいろあったんだなと思ってもらえれば幸いです
+                    </p>
+                </section>
+
+            </div>
+
+        </div>
+
+        <script src="lib/js/head.min.js"></script>
+        <script src="js/reveal.js"></script>
+
+        <script>
+
+            // Full list of configuration options available at:
+            // https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                controls: true,
+                progress: true,
+                history: true,
+                center: true,
+
+                transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+                // Optional reveal.js plugins
+                dependencies: [
+                    { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+                    { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+                    { src: 'plugin/zoom-js/zoom.js', async: true },
+                    { src: 'plugin/notes/notes.js', async: true }
+                ]
+            });
+
+        </script>
+
+    </body>
+</html>

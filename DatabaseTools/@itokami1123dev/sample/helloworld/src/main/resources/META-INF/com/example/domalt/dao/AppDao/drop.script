@@ -1,0 +1,2 @@
+DROP SEQUENCE customer_seq;
+DROP TABLE customer;

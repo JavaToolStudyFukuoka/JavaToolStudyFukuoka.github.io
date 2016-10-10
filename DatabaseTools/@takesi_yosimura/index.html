@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+
+        <title>JDBCについて学んでみる</title>
+
+        <meta name="description" content="JDBCについて学んでみる、Javaツール勉強会＠福岡 2016/08用の発表資料">
+
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+        <link rel="stylesheet" href="css/reveal.css">
+        <link rel="stylesheet" href="css/theme/solarized.css" id="theme">
+
+        <!-- Code syntax highlighting -->
+        <link rel="stylesheet" href="lib/css/zenburn.css">
+
+        <!-- Printing and PDF exports -->
+        <script>
+            var link = document.createElement( 'link' );
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+            document.getElementsByTagName( 'head' )[0].appendChild( link );
+        </script>
+
+        <!--[if lt IE 9]>
+        <script src="lib/js/html5shiv.js"></script>
+        <![endif]-->
+    </head>
+
+    <body>
+
+        <div class="reveal">
+
+            <!-- Any section element inside of this container is displayed as a slide -->
+            <div class="slides">
+                <section>
+                    <h1>JDBCについて<br>学んでみる</h1>
+                    <h3>Javaツール勉強会＠福岡 2016/08</h3>
+                    <p>
+                        <small>吉村 武志 (<a href="http://twitter.com/takesi_yosimura">@takesi_yosimura</a>)</small>
+                    </p>
+                    <aside class="notes">
+                        １／８
+                    </aside>
+                </section>
+
+                <section id="profile">
+                    <h2>自己紹介</h2>
+                    <p>吉村 武志</p>
+                    <p>
+                        福岡周辺の勉強会に時々出没して 、<br>
+                        togetterまとめたりしてる人
+                    </p>
+                    <p>Javaの勉強会やってますが、 仕事はClassic ASP &amp; VB.Net</p>
+                    <p>趣味は音ゲーとかアナログゲーム（ボードゲーム・TRPG）</p>
+                    <p class="fragment">最近はデレステとかハマってます</p>
+                </section>
+
+                <section data-markdown>
+                    # さて。
+                </section>
+                <section data-markdown>
+                    # JavaでDB操作！
+                </section>
+                <section data-markdown>
+                    # やっぱORM？
+                </section>
+                <section data-markdown>
+                    # その前に標準
+                    # 見ましょうね？
+                </section>
+                <section>
+                    <h1>ＪＤＢＣ</h1>
+                    <p class="fragment" style="font-size: 40pt;">
+                        「リレーショナル・データベース<br>
+                        <span style="font-size:24pt">（および、ほとんどすべての表形式のデータ）</span>に<br>
+                        アクセスするための、標準Java API」
+                    </p>
+                </section>
+                <section data-markdown>
+                    # というとどんなイメージ？
+                </section>
+                <section>
+                    <p>
+                        <a herf="http://www.atmarkit.co.jp/ait/articles/0106/26/news001.html"><img src="img/jdbc.gif" style="width:766px;height:280px" /></a><br>
+                        データベース間の差異を吸収するJDBCドライバと、<br>
+                        特定のベンダに依存しない標準APIであるJDBC API<br>
+                    </p>
+                    <p class="fragment" style="font-size:40pt">
+                        これならDBが何かを気にせず書ける！
+                    </p>
+                </section>
+                <section data-markdown>
+                    # それは幻想
+                </section>
+                <section style="font-size: 38pt;">
+                    <p>
+                        単純小規模なら別として、<br>
+                        大抵はDB固有機能に振り回されるかと…
+                    </p>
+                    <p class="fragment">
+                        まあそれはともかく、<br>
+                        まずはコードを書いてみましょう。
+                    </p>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>PostgresSQLに接続する例 </h2>
+<pre style="height:530px; font-size:0.5em"><code class="java" data-trim style="max-height:530px;">
+public void exec() throws ClassNotFoundException, SQLException {
+    String nengappi = "2016/08/11";
+    //ドライバのロード(要：postgresql-?.?.????.jar・・・
+    //参考：https://jdbc.postgresql.org/download.html)
+    Class.forName("org.postgresql.Driver");
+    //データベース接続
+    final String url = "jdbc:postgresql://localhost/yosimuradb";
+    final String user = "yosimura";
+    final String password = "tksypass";
+    try (Connection conn = DriverManager.getConnection(url, user, password)) {
+        //プリペアードステートメント
+        String sql = "SELECT 名称 FROM M_祝祭日 WHERE 年月日 = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, nengappi);
+            //クエリの発行
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    String name = rs.getString(1);
+                    System.out.printf("%sは祝祭日の%sです%n", nengappi, name);
+                } else {
+                    System.out.printf("%sは祝祭日ではないっぽい%n", nengappi);
+                }
+            }
+        }
+    }
+}
+</code></pre>
+                    </section>
+                    <section>
+                        <h2>SQLServerに接続する例 </h2>
+<pre style="height:530px; font-size:0.5em"><code class="java" data-trim style="max-height:530px;">
+public void exec() throws ClassNotFoundException, SQLException {
+    String nengappi = "2016/08/11";
+    //ドライバのロード(要：sqljdbc4.jar…参考：https://msdn.microsoft.com/ja-jp/library/ms378526(v=sql.110).aspx)
+    Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+    //データベース接続
+    final String url = "jdbc:sqlserver://serverName;databaseName=dbName";
+    final String user = "user";
+    final String password = "pass";
+    try (Connection conn = DriverManager.getConnection(url, user, password)) {
+        //プリペアードステートメント
+        String sql = "SELECT 名称 FROM M_祝祭日 WHERE 年月日 = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, nengappi);
+            //クエリの発行
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    String name = rs.getString(1);
+                    System.out.printf("%sは祝祭日の%sです%n", nengappi, name);
+                } else {
+                    System.out.printf("%sは祝祭日ではないっぽい%n", nengappi);
+                }
+            }
+        }
+    }
+}
+</code></pre>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>順に見ていきましょうか</h2>
+                    </section>
+                    <section>
+                        <h2>ドライバのロード</h2>
+<pre style="font-size:0.5em"><code class="java" data-trim>
+//ドライバのロード(要：postgresql-?.?.????.jar・・・
+//参考：https://jdbc.postgresql.org/download.html)
+Class.forName("org.postgresql.Driver");
+</code></pre>
+                        <p class="fragment" style="font-size:0.8em">
+                            PostgreSQL用のJDBCドライバのクラス名を指定して、<br>
+                            <a href="http://docs.oracle.com/javase/jp/8/docs/api/java/lang/Class.html#forName-java.lang.String-">Class.forName</a>でClassをロードします。
+                            <span style="font-size:0.5em">（※Classが返されるが捨てている）</span>
+                        </p>
+                        <p class="fragment" style="font-size:0.8em">
+                            <a href="https://github.com/pgjdbc/pgjdbc/blob/master/pgjdbc/src/main/java/org/postgresql/Driver.java">org.postgresql.Driver</a>クラスではロードされたとき、<br>
+                            staticイニシャライザが呼び出されます。
+                        </p>
+                        <p class="fragment" style="font-size:0.8em">
+                            staticイニシャライザではDriver自分自身が生成され、<br>
+                            <a href="http://docs.oracle.com/javase/jp/8/docs/api/java/sql/DriverManager.html#registerDriver-java.sql.Driver-">DriverManager.registerDriver</a>でマネージャに登録します。
+                        </p>
+                    </section>
+                    <section>
+                        <h2>接続処理</h2>
+<pre style="font-size:0.5em"><code class="java" data-trim>
+final String url = "jdbc:postgresql://localhost/yosimuradb";
+final String user = "yosimura";
+final String password = "tksypass";
+try (Connection conn = DriverManager.getConnection(url, user, password)) {
+    //・・・
+}
+</code></pre>
+                        <p class="fragment" style="font-size:0.8em">
+                            接続用のURL、ユーザ、パスワードを指定し、<br>
+                            <a href="http://docs.oracle.com/javase/jp/8/docs/api/java/sql/DriverManager.html#getConnection-java.lang.String-java.lang.String-java.lang.String-">DriverManager.getConnection</a>にてConnectionを取得します。
+                        </p>
+                        <p class="fragment" style="font-size:0.8em">
+                            Connectionオブジェクトは使用終了時にcloseしなければなりませんが、<br>
+                            上記の例のようにJava7のtry-with-resourceを使うと楽ですね。<br>
+                        </p>
+<pre class="fragment" style="font-size:0.4em"><code class="java" data-trim>
+// Java6以前
+Connection conn = null;
+try {
+    conn = DriverManager.getConnection(url, user, password));
+    //・・・
+} finally {
+    if (conn != null) {
+        try {
+            conn.close();
+        } catch (SQLException ignore) {
+        }
+    }
+}
+</code></pre>
+                    </section>
+                    <section>
+                        <h2 style="font-size:1.9em">プリペアードステートメント</h2>
+<pre style="font-size:0.5em"><code class="java" data-trim>
+//プリペアードステートメント
+String sql = "SELECT 名称 FROM M_祝祭日 WHERE 年月日 = ?";
+try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+    stmt.setString(1, nengappi);
+    //・・・
+}
+</code></pre>
+                        <p class="fragment" style="font-size:0.8em">
+                            <a href="http://docs.oracle.com/javase/jp/8/docs/api/java/sql/Connection.html#prepareStatement-java.lang.String-">Connection.prepareStatement</a>にSQL文字列を渡して、<br>
+                            PreparedStatementを取得します。
+                        </p>
+                        <p class="fragment" style="font-size:0.8em">
+                            <a href="http://docs.oracle.com/javase/jp/8/docs/api/java/sql/PreparedStatement.html">PreparedStatement</a>にはsetXxxxxメソッドがあり、<br>
+                            パラメータ「?」に渡すオブジェクトを指定できます。
+                        </p>
+                        <p class="fragment" style="font-size:0.8em">
+                            文字列結合でSQLに可変パラメータを渡してしまうと、<br>
+                            SQLインジェクション脆弱性の元になるので避けましょう・・・
+                        </p>
+                        <p class="fragment" style="font-size:0.8em">
+                            余談：名前付きパラメータはJDBC標準ではサポートされていません。
+                        </p>
+                        <p class="fragment" style="font-size:0.8em">
+                            DBベンダが<a href="https://docs.oracle.com/cd/E11882_01/appdev.112/e13995/oracle/jdbc/OraclePreparedStatement.html">独自サポート</a>している場合があります。
+                        </p>
+                    </section>
+                    <section>
+                        <h2>クエリの発行</h2>
+<pre style="font-size:0.5em"><code class="java" data-trim>
+//クエリの発行
+try (ResultSet rs = stmt.executeQuery()) {
+    if (rs.next()) {
+        String name = rs.getString(1);
+        System.out.printf("%sは祝祭日の%sです%n", nengappi, name);
+    } else {
+        System.out.printf("%sは祝祭日ではないっぽい%n", nengappi);
+    }
+}
+</code></pre>
+                        <p class="fragment" style="font-size:0.8em">
+                            参照系SQLは、<a href="http://docs.oracle.com/javase/jp/8/docs/api/java/sql/PreparedStatement.html#executeQuery--">PreparedStatement.executeQuery</a>で発行できます。<br>
+                            更新系SQLの場合、<a href="http://docs.oracle.com/javase/jp/8/docs/api/java/sql/PreparedStatement.html#executeUpdate--">PreparedStatement.executeUpdate</a>です。
+                        </p>
+                        <p class="fragment" style="font-size:0.8em">
+                            executeQueryで取得した結果セット<a href="http://docs.oracle.com/javase/jp/8/docs/api/java/sql/ResultSet.html">ResultSet</a>オブジェクトから、<br>
+                            SELECTによる結果を参照できます。
+                        </p>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>でも</h2>
+                        <p>
+                            毎回ドライバロードするのってイケてない
+                        </p>
+                        <p class="fragment">
+                            というかサーバの場合は、つなぎっぱなしにしたい。
+                        </p>
+                    </section>
+                    <section>
+                        <h2>JNDI</h2>
+                        <p>
+                            JNDI = Java Naming and Directory Interfaceを使います。<br>
+                        </p>
+                        <p class="fragment" style="font-size:0.8em">
+                            さっくり言うと、コネクションプールに接続がプールされてるので、<br>
+                            そこからConnectionとってくる・・・ダケ。
+                        </p>
+<pre class="fragment" style="font-size:0.5em"><code class="java" data-trim>
+Context context = new InitialContext();
+DataSource ds = (DataSource)context.lookup("java:comp/env/jdbc/library");
+Connection con = ds.getConnection();
+</code></pre>
+                        <p class="fragment">
+                            こんな感じ。<br>
+                            後の使い方は一緒です。
+                        </p>
+                        <p class="fragment">
+                            多分、サーバに合わせた設定をしておけば使える！
+                        </p>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>さて一休憩</h2>
+                        <p class="fragment">すこし歴史について</p>
+                    </section>
+                    <section>
+                        <h2>JDBCの歴史</h2>
+                        <p class="fragment">1996年2月に発表</p>
+                        <p class="fragment">JDK1.2に含まれる(1996年12月)</p>
+                        <p class="fragment">1998年にはJDBC2.0</p>
+                        <p class="fragment">JDK1.4でJDBC3.0</p>
+                        <p class="fragment">JDK1.6でJDBC4.0</p>
+                    </section>
+                    <section>
+                        <p>
+                            今回私が調べた情報は古いものもあるので、<br>
+                            見落としがあるかもしませんがご勘弁を。
+                        </p>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>JDBCのドライバ</h2>
+                        <p>
+                            あと、JDBCと言えばドライバが色々あるのが気になったので調べました。
+                        </p>
+                        <p class="fragment">
+                            タイプ２ドライバとかタイプ４ドライバとか言ってるアレです。
+                        </p>
+                    </section>
+                    <section>
+                        <h2>タイプ1</h2>
+                        <p>
+                            JDBC-ODBC ブリッジ JDBCからのクエリー要求を、
+                            ODBCを経由して受け渡し、データベースとアクセスするもの。
+                        </p>
+                        <p class="fragment">
+                            ODBCドライバが必須であり、ハードウェアとOSに依存する。
+                        </p>
+                        <p class="fragment">
+                            Java SE7 までに標準で添付されているドライバでもある。
+                        </p>
+                        <p class="fragment">
+                            Java7では非推奨となり、Java8では標準から削除された。
+                        </p>
+                    </section>
+                    <section>
+                        <h2>タイプ2</h2>
+                        <p>
+                            ネイティブ API ドライバ JDBCからのクエリー要求を、
+                            オペーレーティングシステム上のDLLや専用ライブラリに受け渡し、
+                            そこからデータベースにアクセスするもの。
+                        </p>
+                        <p class="fragment">
+                            Type1に比べて階層が薄く済むため高速化が期待できる点とTCP/IPに依存しない利点があるが、
+                            やはりハードウェアとオペレーティングシステムに依存する。
+                        </p>
+                        <p class="fragment">
+                            オラクルでいうとOCIドライバがこれに該当する。
+                        </p>
+                    </section>
+                    <section>
+                        <h2>タイプ3</h2>
+                        <p>
+                            通信プロトコルドライバ JDBCからのクエリー要求を
+                            Java で記述されたドライバ内で独自のプロトコルに変換し、
+                            それをアプリケーションサーバを通じてデータベースにアクセスするもの。
+                        </p>
+                        <p class="fragment">
+                            機種依存・データベース依存をせずに軽量なドライバが作成可能だが、
+                            中間サーバを挟むためにパフォーマンスに問題が起きる。
+                        </p>
+                    </section>
+                    <section>
+                        <h2>タイプ4</h2>
+                        <p>
+                            ネイティブプロトコルドライバJDBCからのクエリー要求をすべて Java 上で処理してしまうもの。
+                        </p>
+                        <p class="fragment">
+                            Java 上にデータベースにアクセスするためのすべての機能を乗せる為、
+                            ドライバのサイズが大きくなる、パフォーマンスが若干低下する。
+                        </p>
+                        <p class="fragment">
+                            基本的にTCP/IPでしか利用できないなどの欠点があるが
+                            ハードウェアとオペレーティングシステムに依存しないため移植性に優れている。
+                        </p>
+                        <p class="fragment">
+                            オラクルでいうと thin ドライバがこれ該当する。
+                        </p>
+                    </section>
+                    <section>
+                        <h2>総括</h2>
+                        <p>
+                            タイプ1、タイプ2はDBMSのDLLファイルやライブラリファイルを呼び出す形となるため、
+                            JVMのメモリー管理外となる。
+                        </p>
+                        <p>
+                            タイプ3、タイプ4についてはJVM上で Java のクラスとして実装されているため
+                            JVM上のガベージコレクションの対象となり管理が行いやすく、流れとしてはTYPE4が主流となっている。
+                        </p>
+                        <p class="fragment">
+                            ま、タイプ２ or タイプ４なのかなと思いました。<br>
+                            中間サーバ挟むタイプ3は面倒そうですし。
+                        </p>
+                    </section>
+                </section>
+
+                <section style="text-align: left;">
+                    <h1>おわり</h1>
+                    <p>
+                        もうちょっと調べるつもりでしたが、力尽きました・・・
+                    </p>
+                </section>
+
+            </div>
+
+        </div>
+
+        <script src="lib/js/head.min.js"></script>
+        <script src="js/reveal.js"></script>
+
+        <script>
+
+            // Full list of configuration options available at:
+            // https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                controls: true,
+                progress: true,
+                history: true,
+                center: true,
+
+                transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+                // Optional reveal.js plugins
+                dependencies: [
+                    { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+                    { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+                    { src: 'plugin/zoom-js/zoom.js', async: true },
+                    { src: 'plugin/notes/notes.js', async: true }
+                ]
+            });
+
+        </script>
+
+    </body>
+</html>

@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+
+        <title>MyBatisについて学んでみる</title>
+
+        <meta name="description" content="MyBatisについて学んでみる、Javaツール勉強会＠福岡 2016/11用の発表資料">
+
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+        <link rel="stylesheet" href="css/reveal.css">
+        <link rel="stylesheet" href="css/theme/solarized.css" id="theme">
+
+        <!-- Code syntax highlighting -->
+        <link rel="stylesheet" href="lib/css/zenburn.css">
+
+        <!-- Printing and PDF exports -->
+        <script>
+            var link = document.createElement( 'link' );
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+            document.getElementsByTagName( 'head' )[0].appendChild( link );
+        </script>
+
+        <!--[if lt IE 9]>
+        <script src="lib/js/html5shiv.js"></script>
+        <![endif]-->
+    </head>
+
+    <body>
+
+        <div class="reveal">
+
+            <!-- Any section element inside of this container is displayed as a slide -->
+            <div class="slides">
+                <section>
+                    <h1>MyBatisについて<br>学んでみる</h1>
+                    <h3>Javaツール勉強会＠福岡 2016/11</h3>
+                    <p>
+                        <small>吉村 武志 (<a href="http://twitter.com/takesi_yosimura">@takesi_yosimura</a>)</small>
+                    </p>
+                </section>
+
+                <section id="profile">
+                    <h2>自己紹介</h2>
+                    <p>吉村 武志</p>
+                    <p>
+                        福岡周辺の勉強会に時々出没して 、<br>
+                        togetterまとめたりしてる人
+                    </p>
+                    <p>Javaの勉強会やってますが、 仕事はClassic ASP &amp; VB.Net</p>
+                    <p>趣味は音ゲーとかアナログゲーム（ボードゲーム・TRPG）</p>
+                </section>
+
+                <section>
+                    <p>
+                        前回<a herf="https://javatoolstudyfukuoka.github.io/DatabaseTools/@takesi_yosimura/#/">JDBC</a>についてやりました
+                    </p>
+                </section>
+                <section>
+                    <p>
+                        JDBCではSQLを好きに書いて投入できる感じですが、<br>
+                        ちょっと辛い部分がありました。
+                    </p>
+                </section>
+                <section>
+                    <h2 style="font-size:1.9em">プリペアードステートメント</h2>
+<pre style="font-size:0.5em"><code class="java" data-trim>
+//プリペアードステートメント
+String sql = "SELECT 名称 FROM M_祝祭日 WHERE 年月日 = ?";
+try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+    stmt.setString(1, nengappi);
+    //・・・
+}
+</code></pre>
+                    <p class="fragment" style="font-size:0.8em">
+                        名前付きパラメータはJDBC標準ではサポートされていません。。。
+                    </p>
+                </section>
+                <section>
+                    <h2 style="font-size:1.9em">プリペアードステートメント</h2>
+<pre style="font-size:0.5em"><code class="java" data-trim>
+//プリペアードステートメント
+String sql = "SELECT SUM(売上金額)"
+           + " FROM "
+           + "(SELECT 売上金額 FROM 売上伝票"
+           + " WHERE 売上日 >= ?"
+           + " AND 売上日 <= ?"
+           + " UNION ALL"
+           + " SELECT 売上金額 FROM 履歴_売上伝票"
+           + " WHERE 売上日 >= ?"
+           + " AND 売上日 <= ?"
+           + ") AS 売上";
+try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+    stmt.setString(1, nengappiFrom);
+    stmt.setString(2, nengappiTo);
+    stmt.setString(3, nengappiFrom);
+    stmt.setString(4, nengappiTo);
+    //・・・
+}
+</code></pre>
+                    <p class="fragment" style="font-size:0.8em">
+                        長いSQLになると辛いってば！！
+                    </p>
+                </section>
+                <section>
+                    <p>
+                        そこをちょっと楽にしたい。
+                    </p>
+                    <p class="fragment">
+                        そこで、MyBatisを使ってみます。
+                    </p>
+                </section>
+                <section>
+                    <h2 style="font-size:1.9em">MyBatis</h2>
+                    <p>
+                        まずは簡単な方法で使ってみます。
+                    </p>
+                    <p class="fragment">
+                        １.mybatis-config.xmlを準備
+                    </p>
+                    <p class="fragment">
+                        ２.マッパーインタフェースを作成
+                    </p>
+                    <p class="fragment">
+                        ３.ＳＱＬ呼び出しする
+                    </p>
+                </section>
+                <section>
+                    <h2 style="font-size:1.9em">mybatis-config.xml</h2>
+<pre style="font-size:0.5em"><code class="xml" data-trim>
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+  <environments default="development">
+    <environment id="development">
+      <transactionManager type="JDBC"/>
+      <dataSource type="POOLED">
+        <property name="driver" value="org.postgresql.Driver"></property>
+        <property name="url" value="jdbc:postgresql://localhost/yosimuradb"></property>
+        <property name="username" value="yosimura"></property>
+        <property name="password" value="tksypass"></property>
+      </dataSource>
+    </environment>
+  </environments>
+  <mappers>
+    <mapper class="info.tsukasaya.mybatistest.TestMapper"></mapper>
+    <mapper resource="info/tsukasaya/mybatistest/TestXMLMapper.xml"></mapper>
+  </mappers>
+</configuration>
+</code></pre>
+                    <p class="fragment" style="font-size:0.8em">
+                        データベース接続設定と「mapper」の設定がありますね。
+                    </p>
+                </section>
+                <section>
+                    <h2 style="font-size:1.9em">マッパーインタフェース</h2>
+<pre style="font-size:0.5em"><code class="java" data-trim>
+public interface TestMapper {
+    @Select("SELECT 名称 FROM M_祝祭日 WHERE 年月日 = #{ymd}")
+    String selectHoliday(String ymd);
+}
+</code></pre>
+                    <p class="fragment" style="font-size:0.8em">
+                        インタフェースのメソッドに、<br>
+                        SelectアノテーションでSQLを定義してあります。<br>
+                        引数名と名前付きパラメータが対応してます。
+                    </p>
+                </section>
+                <section>
+                    <h2 style="font-size:1.9em">ＳＱＬ呼び出し</h2>
+<pre style="font-size:0.5em"><code class="java" data-trim>
+String nengappi = "2016/08/11";
+String resource = "info/tsukasaya/mybatistest/mybatis-config.xml";
+InputStream inputStream = Resources.getResourceAsStream(resource);
+SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+try (SqlSession session = sqlSessionFactory.openSession()) {
+    TestMapper mapper = session.getMapper(TestMapper.class);
+    String name = mapper.selectHoliday(nengappi);
+    if (name != null) {
+        System.out.printf("%sは祝祭日の%sです%n", nengappi, name);
+    } else {
+        System.out.printf("%sは祝祭日ではないっぽい%n", nengappi);
+    }
+}
+</code></pre>
+                    <p class="fragment" style="font-size:0.8em">
+                        1.mybatis-config.xmlを読み込む<br>
+                        2.SqlSessionFactoryを取得<br>
+                        3.SqlSessionを取得<br>
+                        4.定義したマッパーTestMapperを取得<br>
+                        5.定義したメソッドでＳＱＬ呼び出し
+                    </p>
+                </section>
+                <section>
+                    <h2 style="font-size:1.9em">MyBatis</h2>
+                    <p>
+                        ＳＱＬをアノテーションで定義しましたが、<br>
+                        アノテーションでは長いＳＱＬは辛そうですね？
+                    </p>
+                    <p class="fragment">
+                        簡単なＳＱＬ以外はマッピングはＸＭＬで・・・・
+                    </p>
+                </section>
+                <section>
+                    <h2 style="font-size:1.9em">MyBatis</h2>
+                    <p>
+                        さっきよりちょっと手をかけたSQLを呼び出してみます。
+                    </p>
+                    <p class="fragment">
+                        １.mybatis-config.xmlを準備
+                    </p>
+                    <p class="fragment">
+                        ２.マッパーＸＭＬを作成
+                    </p>
+                    <p class="fragment">
+                        ３.パラメータクラスを作成
+                    </p>
+                    <p class="fragment">
+                        ４.ＳＱＬ呼び出しする
+                    </p>
+                </section>
+                <section>
+                    <h2 style="font-size:1.9em">mybatis-config.xml</h2>
+<pre style="font-size:0.5em"><code class="xml" data-trim>
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+  <environments default="development">
+    <environment id="development">
+      <transactionManager type="JDBC"/>
+      <dataSource type="POOLED">
+        <property name="driver" value="org.postgresql.Driver"></property>
+        <property name="url" value="jdbc:postgresql://localhost/yosimuradb"></property>
+        <property name="username" value="yosimura"></property>
+        <property name="password" value="tksypass"></property>
+      </dataSource>
+    </environment>
+  </environments>
+  <mappers>
+    <mapper class="info.tsukasaya.mybatistest.TestMapper"></mapper>
+    <mapper resource="info/tsukasaya/mybatistest/TestXMLMapper.xml"></mapper>
+  </mappers>
+</configuration>
+</code></pre>
+                    <p class="fragment" style="font-size:0.8em">
+                        先ほどと同じ内容です。
+                    </p>
+                </section>
+                <section>
+                    <h2 style="font-size:1.9em">TestXMLMapper.xml<span style="font-size:0.8em">（マッパーＸＭＬ）</span></h2>
+<pre style="font-size:0.5em"><code class="xml" data-trim>
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mybatistest">
+  <select id="selectHoliday" resultType="map" parameterType="info.tsukasaya.mybatistest.TestParameter">
+    SELECT
+       年月日
+      ,名称
+    FROM
+      M_祝祭日
+    WHERE
+      年月日 BETWEEN #{ymdFrom} AND #{ymdTo}
+  </select>
+</mapper>
+</code></pre>
+                    <p class="fragment" style="font-size:0.8em">
+                        識別用の名前としてnamespace、id→"mybatistest.selectHoliday"<br>
+                        結果の型としてresultTypeにmap→java.util.Map<br>
+                        パラメータ用のクラス指定としてparameterType
+                    </p>
+                </section>
+                <section>
+                    <h2 style="font-size:1.9em">TestParameter<span style="font-size:0.8em">（パラメータクラス）</span></h2>
+<pre style="font-size:0.5em"><code class="java" data-trim>
+public class TestParameter {
+    private final String ymdFrom;
+    private final String ymdTo;
+    public TestParameter(String ymdFrom, String ymdTo) {
+        this.ymdFrom = ymdFrom;
+        this.ymdTo = ymdTo;
+    }
+}
+</code></pre>
+                    <p class="fragment" style="font-size:0.8em">
+                        privateフィールドでも読み込まれます。<br>
+                        getterを作っても良いようです。
+                    </p>
+                </section>
+                <section>
+                    <h2 style="font-size:1.9em">ＳＱＬ呼び出し</h2>
+<pre style="font-size:0.5em"><code class="java" data-trim>
+String resource = "info/tsukasaya/mybatistest/mybatis-config.xml";
+InputStream inputStream = Resources.getResourceAsStream(resource);
+SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+try (SqlSession session = sqlSessionFactory.openSession()) {
+    TestParameter param = new TestParameter("2016/05/01", "2016/07/31");
+    List<Map<String, Object>> list = session.selectList("mybatistest.selectHoliday", param);
+    System.out.printf("祝祭日が%d日ありました%n", list.size());
+    list.stream().forEach((map) -> {
+        System.out.printf("%sは%sです%n", map.get("年月日"), map.get("名称"));
+    });
+}
+</code></pre>
+                    <p class="fragment" style="font-size:0.8em">
+                        1.mybatis-config.xmlを読み込む<br>
+                        2.SqlSessionFactoryを取得<br>
+                        3.SqlSessionを取得<br>
+                        4.TestParameterを作成<br>
+                        5.SqlSessionにTestParameterを渡してＳＱＬ呼び出し<br>
+                        ※結果がList<Map<String, Object>>で返ってくる
+                    </p>
+                </section>
+
+                <section>
+                    <h2 style="font-size:1.9em">MyBatis</h2>
+                    <p>
+                        というわけで、<br>
+                        MyBatisでのＳＱＬ呼び出しができましたが、<br>
+                        そもそもどういう場合に嬉しいのでしょうか？
+                    </p>
+                    <p class="fragment">
+                        <a href="https://twitter.com/s_kozake/status/789083961087578112">使ってる方に聞いてみました。</a>
+                    </p>
+                </section>
+
+                <section style="text-align: left;">
+                    <h1>おわり</h1>
+                    <p>
+                        ＬＴ枠で十分だった気がする多分
+                    </p>
+                </section>
+
+            </div>
+
+        </div>
+
+        <script src="lib/js/head.min.js"></script>
+        <script src="js/reveal.js"></script>
+
+        <script>
+
+            // Full list of configuration options available at:
+            // https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                controls: true,
+                progress: true,
+                history: true,
+                center: true,
+
+                transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+                // Optional reveal.js plugins
+                dependencies: [
+                    { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+                    { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+                    { src: 'plugin/zoom-js/zoom.js', async: true },
+                    { src: 'plugin/notes/notes.js', async: true }
+                ]
+            });
+
+        </script>
+
+    </body>
+</html>

@@ -59,7 +59,265 @@
                 </section>
 
                 <section>
-                    <h1>TODO</h1>
+                    <h1>では早速</h1>
+                    <p>標準I/O系ライブラリについて</p>
+                </section>
+
+                <section>
+                    <h1>History</h1>
+                    <table>
+                    <tbody>
+                        <tr>
+                            <td>JDK 1.0</td>
+                            <td><a href="http://docs.oracle.com/javase/jp/8/docs/api/java/io/package-summary.html">java.io</a></td>
+                            <td>昔ながらの<br>データストリームAPI</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="3">JDK 1.4</td>
+                            <td><a href="http://docs.oracle.com/javase/jp/8/docs/api/java/nio/package-summary.html">java.nio</a></td>
+                            <td rowspan="3">java.ioの補足機能のNIO</td>
+                        </tr>
+                        <tr>
+                            <td><a href="http://docs.oracle.com/javase/jp/8/docs/api/java/nio/channels/package-summary.html">java.nio.channels</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="http://docs.oracle.com/javase/jp/8/docs/api/java/nio/charset/package-summary.html">java.nio.charset</a></td>
+                        </tr>
+                        <tr>
+                            <td rowspan="3">JDK 1.7</td>
+                            <td><a href="http://docs.oracle.com/javase/jp/8/docs/api/java/nio/file/package-summary.html">java.nio.file</a></td>
+                            <td rowspan="3">ファイル操作が<br> 強化されたNIO2</td>
+                        </tr>
+                        <tr>
+                            <td><a href="http://docs.oracle.com/javase/jp/8/docs/api/java/nio/file/attribute/package-summary.html">java.nio.file.attribute</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="http://docs.oracle.com/javase/jp/8/docs/api/java/nio/file/spi/package-summary.html">java.nio.file.spi</a></td>
+                        </tr>
+                    </tbody>
+                    </table>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>JDK 1.0</h2>
+                        <p>
+                            データ入出力、読み書き操作といえばjava.ioでした。
+                        </p>
+                        <p class="fragment">
+                            ファイル操作が貧弱で辛い。
+                        </p>
+                    </section>
+                    <section>
+                        <h2>JDK 1.4未満のファイルコピー</h2>
+<pre style="font-size:0.5em"><code class="java" data-trim>
+String sourcePath = "/Users/tksy/work/Java8.jpeg";
+String destPath = "/Users/tksy/work/Java8_copy.jpeg";
+OutputStream out = null;
+InputStream in = null;
+try {
+    out = new BufferedOutputStream(new FileOutputStream(destPath));
+    try {
+        in = new BufferedInputStream(new FileInputStream(sourcePath));
+        byte[] buffer = new byte[256];
+        int size;
+        while ((size = in.read(buffer)) > 0) {
+            out.write(buffer, 0, size);
+        }
+    } finally {
+        if (in != null) {
+            try {
+                in.close();
+            } catch (IOException ignore) {
+            }
+        }
+    }
+} catch (IOException ex) {
+    ex.printStackTrace();
+} finally {
+    if (out != null) {
+        try {
+            out.close();
+        } catch (IOException ignore) {
+        }
+    }
+}
+</code></pre>
+                        <p class="fragment">
+                            わりとおぞましいコード。。。
+                        </p>
+                    </section>
+                    <section>
+                        <p>
+                            それはともかく、java.ioで知っておきたいクラスを幾つか。
+                        </p>
+                    </section>
+                    <section>
+                        <h2>IOストリーム系</h2>
+                        <table>
+                        <tbody>
+                            <tr>
+                                <td>InputStream</td>
+                                <td>入力系ストリームの抽象クラス<br>System.in</td>
+                            </tr>
+                            <tr>
+                                <td>FileInputStream</td>
+                                <td>ファイルからの入力ストリーム</td>
+                            </tr>
+                            <tr>
+                                <td>BufferedInputStream</td>
+                                <td>バッファ機能付き</td>
+                            </tr>
+                            <tr>
+                                <td>OutputStream</td>
+                                <td>出力系ストリームの抽象クラス</td>
+                            </tr>
+                            <tr>
+                                <td>FileOutputStream</td>
+                                <td>ファイルへの出力ストリーム</td>
+                            </tr>
+                            <tr>
+                                <td>BufferedOutputStream</td>
+                                <td>バッファ機能付き</td>
+                            </tr>
+                            <tr>
+                                <td>PrintStream</td>
+                                <td>データ値の出力ができる<br>System.out</td>
+                            </tr>
+                        </tbody>
+                        </table>
+                    </section>
+                    <section>
+                        <h2>Reader/Writer</h2>
+                        <table>
+                        <tbody>
+                            <tr>
+                                <td>Reader</td>
+                                <td>文字ストリームの読み込み用</td>
+                            </tr>
+                            <tr>
+                                <td>InputStreamReader</td>
+                                <td>InputStreamとの橋渡し用</td>
+                            </tr>
+                            <tr>
+                                <td>FileReader</td>
+                                <td>文字ファイルの読み込み用</td>
+                            </tr>
+                            <tr>
+                                <td>Writer</td>
+                                <td>文字ストリームの書き込み用</td>
+                            </tr>
+                            <tr>
+                                <td>OutputStreamWriter</td>
+                                <td>OutputStreamとの橋渡し用</td>
+                            </tr>
+                            <tr>
+                                <td>FileWriter</td>
+                                <td>文字ファイルの書き込み用</td>
+                            </tr>
+                        </tbody>
+                        </table>
+                        <p>最近は使わないかな？</p>
+                    </section>
+                    <section>
+                        <h2>直列化関連</h2>
+                        <table>
+                        <tbody>
+                            <tr>
+                                <td>Serializable</td>
+                                <td>クラスの直列化可能性のマーク</td>
+                            </tr>
+                            <tr>
+                                <td>ObjectOutputStream</td>
+                                <td>直列化データの出力用</td>
+                            </tr>
+                            <tr>
+                                <td>ObjectInputStream</td>
+                                <td>直列化復元用</td>
+                            </tr>
+                        </tbody>
+                        </table>
+                        <p>シリアライズデータの読み書き関連の話</p>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>JDK 1.4</h2>
+                        <p>
+                            New I/O(NIO)APIが追加されました。
+                        </p>
+                        <p class="fragment">
+                            でも、使ったことないです。。。
+                        </p>
+                    </section>
+                    <section>
+                        <h2>JDK 1.4</h2>
+                        <p>
+                            こんな機能がある模様。
+                        </p>
+                        <table>
+                        <tbody>
+                            <tr>
+                                <td>バッファ</td>
+                                <td>NIOの他の機能で使う</td>
+                            </tr>
+                            <tr>
+                                <td>チャネル</td>
+                                <td>入出力操作のための接続</td>
+                            </tr>
+                            <tr>
+                                <td>キャラクタセット</td>
+                                <td>文字コードの取り扱い用</td>
+                            </tr>
+                        </tbody>
+                        </table>
+                        <p class="fragment">
+                            すみません、試せてないです。
+                        </p>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>JDK 1.7</h2>
+                        <p>
+                            IO APIの改良APIです。
+                        </p>
+                        <a href="http://www.slideshare.net/OracleMiddleJP/new-feature-of-java-se-7/23"><img src="img/nio2.png"></a>
+                        <p class="fragment">
+                            おおお、使えるならこれを使いたい。
+                        </p>
+                    </section>
+                    <section>
+                        <h2>JDK 1.7</h2>
+                        <p>
+                            NIO2はこの辺りが便利そう
+                        </p>
+                        <table>
+                        <tbody>
+                            <tr>
+                                <td>FileSystems</td>
+                                <td>ファイル・システム用のファクトリ</td>
+                            </tr>
+                            <tr>
+                                <td>FileSystem</td>
+                                <td>入出力操作のための接続</td>
+                            </tr>
+                            <tr>
+                                <td>Path</td>
+                                <td>システムに依存するファイル・パスを表す</td>
+                            </tr>
+                            <tr>
+                                <td>Files</td>
+                                <td>様々なファイル操作が可能</td>
+                            </tr>
+                        </tbody>
+                        </table>
+                        <p class="fragment">
+                            Filesで大抵のファイル操作できそう！
+                        </p>
+                    </section>
                 </section>
 
                 <section id="end">
